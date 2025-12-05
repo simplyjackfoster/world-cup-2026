@@ -24,3 +24,8 @@ Vite will start on http://localhost:5173 by default.
 ## Notes
 - Predictions default to the current standings; switching to **Prediction mode** lets you reorder group tables and click teams in the bracket to push them forward.
 - The mock also includes a Host City explorer with stadium info and fixture links into the match modal.
+
+## Host cities data
+- Data model lives in `src/types/hostCities.ts` and the static dataset in `src/data/hostCities.ts`.
+- A scaffolding script (`scripts/buildHostCities.ts`) is included to rebuild the dataset from the official FIFA match schedule PDF/HTML when network access is available. The current environment was offline, so matches are empty placeholders until the script can pull authoritative data.
+- Run `ts-node scripts/buildHostCities.ts` after enabling network access to refresh the dataset.
