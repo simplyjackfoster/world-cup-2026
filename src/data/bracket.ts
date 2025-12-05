@@ -15,46 +15,54 @@ export interface KnockoutMatch {
   away: KnockoutSlot;
 }
 
-const pairing = (home: string, away: string, stage: Stage, index: number): KnockoutMatch => ({
-  id: `${stage}-${index}`,
-  stage,
-  home: { id: `${stage}-${index}-H`, stage, source: home },
-  away: { id: `${stage}-${index}-A`, stage, source: away },
-});
-
-const groupOrder: GroupId[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+const pairing = (home: string, away: string, stage: Stage, matchNumber: number): KnockoutMatch => {
+  const id = `${stage}-${matchNumber}`;
+  return {
+    id,
+    stage,
+    home: { id: `${id}-H`, stage, source: home },
+    away: { id: `${id}-A`, stage, source: away },
+  };
+};
 
 export const BRACKET_SLOTS: KnockoutMatch[] = [
-  ...groupOrder.flatMap((group, idx) =>
-    idx % 2 === 0
-      ? [pairing(`Group ${group} winner`, `Group ${group} runner-up`, 'R32', idx + 1)]
-      : [pairing(`Group ${group} runner-up`, `Group ${group} winner`, 'R32', idx + 1)],
-  ),
-  // Additional best third place play-ins
-  pairing('Best 3rd place #1', 'Best 3rd place #8', 'R32', 13),
-  pairing('Best 3rd place #2', 'Best 3rd place #7', 'R32', 14),
-  pairing('Best 3rd place #3', 'Best 3rd place #6', 'R32', 15),
-  pairing('Best 3rd place #4', 'Best 3rd place #5', 'R32', 16),
-  // Round of 16
-  pairing('Winner R32-1', 'Winner R32-2', 'R16', 1),
-  pairing('Winner R32-3', 'Winner R32-4', 'R16', 2),
-  pairing('Winner R32-5', 'Winner R32-6', 'R16', 3),
-  pairing('Winner R32-7', 'Winner R32-8', 'R16', 4),
-  pairing('Winner R32-9', 'Winner R32-10', 'R16', 5),
-  pairing('Winner R32-11', 'Winner R32-12', 'R16', 6),
-  pairing('Winner R32-13', 'Winner R32-14', 'R16', 7),
-  pairing('Winner R32-15', 'Winner R32-16', 'R16', 8),
-  // Quarterfinals
-  pairing('Winner R16-1', 'Winner R16-2', 'QF', 1),
-  pairing('Winner R16-3', 'Winner R16-4', 'QF', 2),
-  pairing('Winner R16-5', 'Winner R16-6', 'QF', 3),
-  pairing('Winner R16-7', 'Winner R16-8', 'QF', 4),
-  // Semifinals
-  pairing('Winner QF-1', 'Winner QF-2', 'SF', 1),
-  pairing('Winner QF-3', 'Winner QF-4', 'SF', 2),
-  // Third place & Final
-  pairing('Loser SF-1', 'Loser SF-2', '3P', 1),
-  pairing('Winner SF-1', 'Winner SF-2', 'F', 1),
+  // Round of 32 (Match 73-88)
+  pairing('Group A runner-up', 'Group B runner-up', 'R32', 73),
+  pairing('Group E winner', 'Group A/B/C/D/F third place', 'R32', 74),
+  pairing('Group F winner', 'Group C runner-up', 'R32', 75),
+  pairing('Group C winner', 'Group F runner-up', 'R32', 76),
+  pairing('Group I winner', 'Group C/D/F/G/H third place', 'R32', 77),
+  pairing('Group E runner-up', 'Group I runner-up', 'R32', 78),
+  pairing('Group A winner', 'Group C/E/F/H/I third place', 'R32', 79),
+  pairing('Group L winner', 'Group E/H/I/J/K third place', 'R32', 80),
+  pairing('Group D winner', 'Group B/E/F/I/J third place', 'R32', 81),
+  pairing('Group G winner', 'Group A/E/H/I/J third place', 'R32', 82),
+  pairing('Group K runner-up', 'Group L runner-up', 'R32', 83),
+  pairing('Group H winner', 'Group J runner-up', 'R32', 84),
+  pairing('Group B winner', 'Group E/F/G/I/J third place', 'R32', 85),
+  pairing('Group J winner', 'Group H runner-up', 'R32', 86),
+  pairing('Group K winner', 'Group D/E/I/J/L third place', 'R32', 87),
+  pairing('Group D runner-up', 'Group G runner-up', 'R32', 88),
+  // Round of 16 (Match 89-96)
+  pairing('Winner R32-74', 'Winner R32-77', 'R16', 89),
+  pairing('Winner R32-73', 'Winner R32-75', 'R16', 90),
+  pairing('Winner R32-76', 'Winner R32-78', 'R16', 91),
+  pairing('Winner R32-79', 'Winner R32-80', 'R16', 92),
+  pairing('Winner R32-83', 'Winner R32-84', 'R16', 93),
+  pairing('Winner R32-81', 'Winner R32-82', 'R16', 94),
+  pairing('Winner R32-86', 'Winner R32-88', 'R16', 95),
+  pairing('Winner R32-85', 'Winner R32-87', 'R16', 96),
+  // Quarterfinals (Match 97-100)
+  pairing('Winner R16-89', 'Winner R16-90', 'QF', 97),
+  pairing('Winner R16-93', 'Winner R16-94', 'QF', 98),
+  pairing('Winner R16-91', 'Winner R16-92', 'QF', 99),
+  pairing('Winner R16-95', 'Winner R16-96', 'QF', 100),
+  // Semifinals (Match 101-102)
+  pairing('Winner QF-97', 'Winner QF-98', 'SF', 101),
+  pairing('Winner QF-99', 'Winner QF-100', 'SF', 102),
+  // Third place & Final (Match 103-104)
+  pairing('Loser SF-101', 'Loser SF-102', '3P', 103),
+  pairing('Winner SF-101', 'Winner SF-102', 'F', 104),
 ];
 
 export const teamMeta: Record<Team, { confed: string; flag: string }> = {

@@ -67,9 +67,10 @@ export const resolveSource = (
   standings: Record<GroupId, TeamStanding[]>,
   predictions: PredictionsState,
 ): Team | null => {
-  const groupWinnerMatch = source.match(/Group ([A-L]) winner/);
-  const groupRunnerMatch = source.match(/Group ([A-L]) runner-up/);
+  const groupWinnerMatch = source.match(/Group ([A-L]) winners?/);
+  const groupRunnerMatch = source.match(/Group ([A-L]) runners?-up/);
   const bestThirdMatch = source.match(/Best 3rd place #(\d+)/);
+  const groupedThirdMatch = source.match(/Group ([A-L](?:\/[A-L])*) third place/);
   const winnerMatch = source.match(/Winner (R\d{2}|QF|SF|3P)-(\d+)/);
   const loserMatch = source.match(/Loser (SF)-(\d+)/);
 
@@ -85,6 +86,11 @@ export const resolveSource = (
     const rank = Number(bestThirdMatch[1]);
     const thirds = computeThirdPlaces(standings);
     return thirds[rank - 1]?.standing.team ?? null;
+  }
+  if (groupedThirdMatch) {
+    const groups = groupedThirdMatch[1].split('/') as GroupId[];
+    const thirds = computeThirdPlaces(standings).filter((entry) => groups.includes(entry.group));
+    return thirds[0]?.standing.team ?? null;
   }
   if (winnerMatch) {
     const [, stage, index] = winnerMatch;
