@@ -1,13 +1,12 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { buildMatchesWithTeams, getTeamMeta, useTournament } from '../context/TournamentContext';
 import { BRACKET_SLOTS, Stage } from '../data/bracket';
 import { Team } from '../data/groups';
-import MatchModal from './MatchModal';
-import { fixtures } from '../data/groups';
+import BracketMatchModal from './BracketMatchModal';
 
 const stageOrder: Stage[] = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
 
-const stageLabel: Record<Stage, string> = {
+export const stageLabel: Record<Stage, string> = {
   R32: 'Round of 32',
   R16: 'Round of 16',
   QF: 'Quarterfinals',
@@ -18,7 +17,9 @@ const stageLabel: Record<Stage, string> = {
 
 export default function Bracket() {
   const { standings, predictions, setPrediction, mode } = useTournament();
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<ReturnType<typeof buildMatchesWithTeams>['matches'][number] | null>(
+    null,
+  );
   const [connections, setConnections] = useState<{ from: string; to: string; d: string }[]>([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const matchRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -28,7 +29,7 @@ export default function Bracket() {
     [mode, standings, predictions],
   );
 
-  const combinedPredictions = mode === 'results' ? autoPred : predictions;
+  const combinedPredictions = mode === 'results' ? { ...autoPred, ...predictions } : predictions;
 
   const findNextMatch = (matchId: string) =>
     BRACKET_SLOTS.find((slot) => slot.home.source === `Winner ${matchId}` || slot.away.source === `Winner ${matchId}`);
@@ -82,14 +83,7 @@ export default function Bracket() {
     };
   }, [matches]);
 
-  const openTeamInfo = (team: Team | null) => {
-    if (!team) return;
-    setSelectedTeam(team);
-  };
-
   const winningTeam = (matchId: string) => combinedPredictions[matchId];
-
-  const activeFixture = selectedTeam ? fixtures.find((f) => f.home === selectedTeam || f.away === selectedTeam) : null;
 
   const matchesByStage = useMemo(
     () =>
@@ -108,16 +102,14 @@ export default function Bracket() {
 
   const knockoutStages: Stage[] = ['R32', 'R16', 'QF', 'SF'];
 
-  const handleTeamClick = (matchId: string, team: Team | null) => {
+  const handleTeamClick = (e: MouseEvent, matchId: string, team: Team | null) => {
+    e.stopPropagation();
     if (!team) return;
-    if (mode === 'predictions') {
-      setPrediction(matchId, team);
-    }
-    openTeamInfo(team);
+    setPrediction(matchId, team);
   };
 
   const renderStageColumn = (stage: Stage, stageMatches: typeof matches) => (
-    <div key={stage} className="flex-1 min-w-[220px] space-y-3">
+    <div key={stage} className="flex-1 min-w-[190px] max-w-[240px] space-y-3 shrink">
       <p className="inline-block rounded-md border border-slate-800 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-100">
         {stageLabel[stage]}
       </p>
@@ -126,7 +118,8 @@ export default function Bracket() {
           <div
             key={match.id}
             ref={registerMatchRef(match.id)}
-            className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 shadow-lg"
+            onClick={() => setSelectedMatch(match)}
+            className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 shadow-lg hover:border-accent/40 cursor-pointer transition"
           >
             <div className="flex items-center justify-between mb-2 text-[11px] uppercase text-slate-400">
               <p className="font-semibold">{match.id}</p>
@@ -138,7 +131,7 @@ export default function Bracket() {
               return (
                 <Fragment key={team ?? i}>
                   <button
-                    onClick={() => handleTeamClick(match.id, team ?? null)}
+                    onClick={(e) => handleTeamClick(e, match.id, team ?? null)}
                     className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left transition ${
                       isWinner
                         ? 'bg-accent/20 border border-accent text-accent shadow-[0_0_0_1px_rgba(56,189,248,0.35)]'
@@ -171,11 +164,11 @@ export default function Bracket() {
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Knockout view</p>
           <h2 className="text-2xl font-semibold">Interactive Bracket</h2>
         </div>
-        <p className="text-xs text-slate-300">Click a team to advance and tap again for more info.</p>
+        <p className="text-xs text-slate-300">Tap a team to advance; click the card for full match details.</p>
       </div>
       <div className="overflow-x-auto pb-10">
-        <div ref={canvasRef} className="relative inline-block">
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden>
+        <div ref={canvasRef} className="relative w-full">
+          <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" aria-hidden>
             {connections.map((conn) => (
               <path
                 key={`${conn.from}-${conn.to}`}
@@ -188,21 +181,28 @@ export default function Bracket() {
               />
             ))}
           </svg>
-          <div className="flex items-start gap-10 min-w-[1400px]">
-            <div className="flex gap-6 items-start">
+          <div className="flex items-start justify-center gap-8 min-w-max px-2">
+            <div className="flex gap-6 items-start flex-shrink-0">
               {knockoutStages.map((stage) => renderStageColumn(stage, splitStage(stage).left))}
             </div>
-            <div className="flex flex-col items-center gap-6 min-w-[240px] px-4">
+            <div className="flex flex-col items-center gap-6 min-w-[260px] px-4 flex-shrink-0">
               {renderStageColumn('F', matchesByStage.F)}
               {renderStageColumn('3P', matchesByStage['3P'])}
             </div>
-            <div className="flex gap-6 items-start flex-row-reverse">
+            <div className="flex gap-6 items-start flex-row-reverse flex-shrink-0">
               {knockoutStages.map((stage) => renderStageColumn(stage, splitStage(stage).right))}
             </div>
           </div>
         </div>
       </div>
-      {activeFixture && <MatchModal fixture={activeFixture} onClose={() => setSelectedTeam(null)} />}
+      {selectedMatch && (
+        <BracketMatchModal
+          match={selectedMatch}
+          stageLabel={stageLabel[selectedMatch.stage]}
+          winner={winningTeam(selectedMatch.id)}
+          onClose={() => setSelectedMatch(null)}
+        />
+      )}
     </div>
   );
 }
