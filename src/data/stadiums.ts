@@ -16,7 +16,7 @@ export const STADIUMS: Stadium[] = [
     city: 'Mexico City',
     country: 'Mexico',
     capacity: 87000,
-    matches: ['A-1', 'C-2', 'K-1'],
+    matches: ['A-1', 'C-2', 'K-1', 'R32-79', 'R16-92'],
   },
   {
     id: 'metlife',
@@ -24,7 +24,7 @@ export const STADIUMS: Stadium[] = [
     city: 'East Rutherford',
     country: 'USA',
     capacity: 82500,
-    matches: ['B-1', 'F-2', 'H-1', 'R32-1'],
+    matches: ['B-1', 'F-2', 'H-1', 'R32-77'],
   },
   {
     id: 'sofistadium',
@@ -32,7 +32,7 @@ export const STADIUMS: Stadium[] = [
     city: 'Los Angeles',
     country: 'USA',
     capacity: 70000,
-    matches: ['D-2', 'G-1', 'R16-4'],
+    matches: ['D-2', 'G-1', 'R32-73', 'R32-84', 'QF-98'],
   },
   {
     id: 'bcplace',
@@ -40,7 +40,7 @@ export const STADIUMS: Stadium[] = [
     city: 'Vancouver',
     country: 'Canada',
     capacity: 54000,
-    matches: ['E-1', 'I-2', 'SF-1'],
+    matches: ['E-1', 'I-2', 'R32-85', 'R16-96'],
   },
   {
     id: 'lumen',
@@ -48,7 +48,7 @@ export const STADIUMS: Stadium[] = [
     city: 'Seattle',
     country: 'USA',
     capacity: 68000,
-    matches: ['J-2', 'L-1', 'QF-2'],
+    matches: ['J-2', 'L-1', 'R32-82', 'R16-94'],
   },
   {
     id: 'mercedes',
@@ -56,6 +56,6 @@ export const STADIUMS: Stadium[] = [
     city: 'Atlanta',
     country: 'USA',
     capacity: 71000,
-    matches: ['R32-8', 'R16-1', '3P-1'],
+    matches: ['R32-80', 'R16-95', 'SF-102'],
   },
 ];
