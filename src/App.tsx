@@ -3,9 +3,9 @@ import Bracket from './components/Bracket';
 import GroupGrid from './components/GroupGrid';
 import HostCityExplorer from './components/HostCityExplorer';
 import MyTeams from './components/MyTeams';
-import PredictionSidebar from './components/PredictionSidebar';
 import GroupDetail from './components/GroupDetail';
 import { useState } from 'react';
+import GroupRankingsPanel from './components/GroupRankingsPanel';
 
 const navClasses = ({ isActive }: { isActive: boolean }) =>
   `px-4 py-2 rounded-full text-sm font-semibold transition ${
@@ -55,7 +55,7 @@ function App() {
                 </div>
                 <div className="space-y-4">
                   <MyTeams />
-                  <PredictionSidebar />
+                  <GroupRankingsPanel />
                 </div>
               </div>
             }
@@ -67,7 +67,7 @@ function App() {
             element={
               <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mt-6">
                 <MyTeams />
-                <PredictionSidebar compact />
+                <GroupRankingsPanel />
               </div>
             }
           />
