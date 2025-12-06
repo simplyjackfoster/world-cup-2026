@@ -3,6 +3,7 @@ import { buildMatchesWithTeams, getTeamMeta, useTournament } from '../context/To
 import { BRACKET_SLOTS, Stage } from '../data/bracket';
 import { Team } from '../data/groups';
 import BracketMatchModal from './BracketMatchModal';
+import DraftKingsOddsPanel from './DraftKingsOddsPanel';
 
 const stageOrder: Stage[] = ['R32', 'R16', 'QF', 'SF', '3P', 'F'];
 
@@ -24,6 +25,7 @@ export default function Bracket() {
     randomizeBracket,
     eloLoading,
     eloError,
+    eloAsOf,
   } = useTournament();
   const [selectedMatch, setSelectedMatch] = useState<ReturnType<typeof buildMatchesWithTeams>['matches'][number] | null>(
     null,
@@ -182,12 +184,15 @@ export default function Bracket() {
           </button>
         </div>
       </div>
-      <p className="text-xs text-slate-300">
-        {eloLoading && 'Loading ELO data for smart picks…'}
-        {!eloLoading && eloError && `ELO feed unavailable right now: ${eloError}`}
-        {!eloLoading && !eloError &&
-          'Tap a team to advance, or auto-pick with ELO or a full random bracket above.'}
-      </p>
+      <div className="grid gap-4 lg:grid-cols-[2fr_1fr] items-start">
+        <p className="text-xs text-slate-300">
+          {eloLoading && 'Loading ELO snapshot for smart picks…'}
+          {!eloLoading && eloError && `ELO snapshot unavailable right now: ${eloError}`}
+          {!eloLoading && !eloError &&
+            `Tap a team to advance, or auto-pick with ELO (as of ${eloAsOf ?? 'Dec 5, 2025'}) or a full random bracket above.`}
+        </p>
+        <DraftKingsOddsPanel limit={6} />
+      </div>
       <div className="overflow-x-auto pb-10">
         <div ref={canvasRef} className="relative w-full">
           <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" aria-hidden>

@@ -1,7 +1,7 @@
 import { useTournament } from '../context/TournamentContext';
 
 export default function GroupControls() {
-  const { rankStandingsByElo, randomizeStandings, eloLoading, eloError, refreshEloRatings } = useTournament();
+  const { rankStandingsByElo, randomizeStandings, eloLoading, eloError, refreshEloRatings, eloAsOf } = useTournament();
 
   return (
     <div className="bg-pitch border border-slate-800 rounded-2xl p-4 shadow-card flex flex-col gap-2">
@@ -27,10 +27,10 @@ export default function GroupControls() {
         </div>
       </div>
       <p className="text-xs text-slate-400">
-        {eloLoading && 'Loading the latest FiveThirtyEight ELO ratings…'}
+        {eloLoading && 'Loading the December 5, 2025 ELO snapshot…'}
         {!eloLoading && eloError && (
           <>
-            Couldn’t reach the ELO feed.{' '}
+            Couldn’t load the stored ELO snapshot.{' '}
             <button className="text-accent underline" onClick={refreshEloRatings}>
               Retry
             </button>
@@ -38,6 +38,9 @@ export default function GroupControls() {
         )}
         {!eloLoading && !eloError &&
           'Use the buttons above to auto-fill standings. You can still drag teams to adjust after applying.'}
+        {!eloLoading && eloAsOf && (
+          <span className="block text-[11px] text-slate-500 mt-1">ELO as of {eloAsOf}</span>
+        )}
       </p>
     </div>
   );
