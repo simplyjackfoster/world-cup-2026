@@ -4,6 +4,7 @@ import GroupGrid from './components/GroupGrid';
 import HostCityExplorer from './components/HostCityExplorer';
 import MyTeams from './components/MyTeams';
 import GroupDetail from './components/GroupDetail';
+import GroupControls from './components/GroupControls';
 import { useState } from 'react';
 
 const navClasses = ({ isActive }: { isActive: boolean }) =>
@@ -49,6 +50,7 @@ function App() {
             element={
               <div className="grid lg:grid-cols-[2fr_1fr] gap-6 mt-6">
                 <div className="space-y-4">
+                  <GroupControls />
                   <GroupGrid onSelectGroup={setSelectedGroup} />
                   {selectedGroup && <GroupDetail groupId={selectedGroup} onClose={() => setSelectedGroup(null)} />}
                 </div>
