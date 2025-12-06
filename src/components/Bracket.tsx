@@ -262,122 +262,124 @@ export default function Bracket() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr] items-start">
-        <div className="space-y-3 text-sm text-slate-200">
-          <p>
-            {eloLoading && 'Loading ELO snapshot for smart picks…'}
-            {!eloLoading && eloError && `ELO snapshot unavailable right now: ${eloError}`}
-            {!eloLoading && !eloError &&
-              `Tap a team to advance, or auto-pick with ELO (as of ${eloAsOf ?? 'Dec 5, 2025'}) or a full random bracket above.`}
-            {draftKingsLoading && ' DraftKings outrights are loading…'}
-            {!draftKingsLoading && draftKingsError && (
-              <>
-                {' '}DraftKings outrights unavailable: {draftKingsError}{' '}
-                <button className="underline text-accent" onClick={refreshDraftKingsOdds}>
-                  Retry
-                </button>
-              </>
-            )}
-            {!draftKingsLoading && draftKingsAsOf && ` DraftKings odds as of ${draftKingsAsOf}.`}
-          </p>
-          <div className="flex flex-wrap gap-2 text-[12px] text-slate-300">
-            <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
-              <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
-              Selected winner
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
-              <span className="h-2 w-2 rounded-full bg-slate-500" aria-hidden />
-              Waiting for group finish
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
-              <span className="h-2 w-2 rounded-full bg-slate-700" aria-hidden />
-              Hover or focus to inspect, click for details
-            </span>
-          </div>
-        </div>
-        <DraftKingsOddsPanel limit={6} />
-      </div>
-
-      <div className="overflow-x-auto pb-10" aria-label="Knockout bracket">
-        <div ref={canvasRef} className="relative w-full">
-          <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" aria-hidden>
-            {connections.map((conn) => (
-              <path
-                key={`${conn.from}-${conn.to}`}
-                d={conn.d}
-                fill="none"
-                stroke="#cbd5f5"
-                strokeWidth={2}
-                strokeLinejoin="miter"
-                strokeLinecap="square"
-              />
-            ))}
-          </svg>
-          <div className="flex items-start justify-center gap-8 min-w-max px-2">
-            <div className="flex gap-6 items-start flex-shrink-0">
-              {knockoutStages.map((stage) => (
-                <RoundColumn
-                  key={`left-${stage}`}
-                  stage={stage}
-                  matches={splitStage(stage).left}
-                  widthClass={columnWidthClasses[stage]}
-                  renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
-                />
-              ))}
+        <div className="space-y-4 text-sm text-slate-200">
+          <div className="space-y-3">
+            <p>
+              {eloLoading && 'Loading ELO snapshot for smart picks…'}
+              {!eloLoading && eloError && `ELO snapshot unavailable right now: ${eloError}`}
+              {!eloLoading && !eloError &&
+                `Tap a team to advance, or auto-pick with ELO (as of ${eloAsOf ?? 'Dec 5, 2025'}) or a full random bracket above.`}
+              {draftKingsLoading && ' DraftKings outrights are loading…'}
+              {!draftKingsLoading && draftKingsError && (
+                <>
+                  {' '}DraftKings outrights unavailable: {draftKingsError}{' '}
+                  <button className="underline text-accent" onClick={refreshDraftKingsOdds}>
+                    Retry
+                  </button>
+                </>
+              )}
+              {!draftKingsLoading && draftKingsAsOf && ` DraftKings odds as of ${draftKingsAsOf}.`}
+            </p>
+            <div className="flex flex-wrap gap-2 text-[12px] text-slate-300">
+              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
+                <span className="h-2 w-2 rounded-full bg-accent" aria-hidden />
+                Selected winner
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
+                <span className="h-2 w-2 rounded-full bg-slate-500" aria-hidden />
+                Waiting for group finish
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1">
+                <span className="h-2 w-2 rounded-full bg-slate-700" aria-hidden />
+                Hover or focus to inspect, click for details
+              </span>
             </div>
-            <div className="flex flex-col items-center gap-6 min-w-[280px] px-4 flex-shrink-0">
-              <RoundColumn
-                stage="F"
-                matches={matchesByStage.F}
-                widthClass={columnWidthClasses.F}
-                renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
-              />
-              <RoundColumn
-                stage="3P"
-                matches={matchesByStage['3P']}
-                widthClass={columnWidthClasses['3P']}
-                renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
-              />
-              <div className="w-full rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-200">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Final four</p>
-                <div className="mt-3 space-y-2">
-                  {matchesByStage.SF.map((match) => {
-                    const champion = winningTeam('F-104');
-                    return (
-                      <div key={match.id} className="flex items-center justify-between rounded-lg bg-slate-950/80 px-3 py-2">
-                        <span className="text-[13px] font-semibold text-slate-100">{match.id}</span>
-                        <span className="text-sm text-accent">
-                          {champion && winningTeam(match.id) === champion ? 'Champions path' : 'Semifinal'}
-                        </span>
+          </div>
+
+          <div className="overflow-x-auto pb-10" aria-label="Knockout bracket">
+            <div ref={canvasRef} className="relative w-full">
+              <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" aria-hidden>
+                {connections.map((conn) => (
+                  <path
+                    key={`${conn.from}-${conn.to}`}
+                    d={conn.d}
+                    fill="none"
+                    stroke="#cbd5f5"
+                    strokeWidth={2}
+                    strokeLinejoin="miter"
+                    strokeLinecap="square"
+                  />
+                ))}
+              </svg>
+              <div className="flex items-start justify-center gap-8 min-w-max px-2">
+                <div className="flex gap-6 items-start flex-shrink-0">
+                  {knockoutStages.map((stage) => (
+                    <RoundColumn
+                      key={`left-${stage}`}
+                      stage={stage}
+                      matches={splitStage(stage).left}
+                      widthClass={columnWidthClasses[stage]}
+                      renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
+                    />
+                  ))}
+                </div>
+                <div className="flex flex-col items-center gap-6 min-w-[280px] px-4 flex-shrink-0">
+                  <RoundColumn
+                    stage="F"
+                    matches={matchesByStage.F}
+                    widthClass={columnWidthClasses.F}
+                    renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
+                  />
+                  <RoundColumn
+                    stage="3P"
+                    matches={matchesByStage['3P']}
+                    widthClass={columnWidthClasses['3P']}
+                    renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
+                  />
+                  <div className="w-full rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-200">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Final four</p>
+                    <div className="mt-3 space-y-2">
+                      {matchesByStage.SF.map((match) => {
+                        const champion = winningTeam('F-104');
+                        return (
+                          <div key={match.id} className="flex items-center justify-between rounded-lg bg-slate-950/80 px-3 py-2">
+                            <span className="text-[13px] font-semibold text-slate-100">{match.id}</span>
+                            <span className="text-sm text-accent">
+                              {champion && winningTeam(match.id) === champion ? 'Champions path' : 'Semifinal'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                      <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2">
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Champion</p>
+                        <div className="mt-2">
+                          <TeamChip
+                            team={winningTeam('F-104') ?? null}
+                            source="Winner of Final"
+                            selected={!!winningTeam('F-104')}
+                            disabled
+                          />
+                        </div>
                       </div>
-                    );
-                  })}
-                  <div className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Champion</p>
-                    <div className="mt-2">
-                      <TeamChip
-                        team={winningTeam('F-104') ?? null}
-                        source="Winner of Final"
-                        selected={!!winningTeam('F-104')}
-                        disabled
-                      />
                     </div>
                   </div>
                 </div>
+                <div className="flex gap-6 items-start flex-row-reverse flex-shrink-0">
+                  {knockoutStages.map((stage) => (
+                    <RoundColumn
+                      key={`right-${stage}`}
+                      stage={stage}
+                      matches={splitStage(stage).right}
+                      widthClass={columnWidthClasses[stage]}
+                      renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="flex gap-6 items-start flex-row-reverse flex-shrink-0">
-              {knockoutStages.map((stage) => (
-                <RoundColumn
-                  key={`right-${stage}`}
-                  stage={stage}
-                  matches={splitStage(stage).right}
-                  widthClass={columnWidthClasses[stage]}
-                  renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
-                />
-              ))}
             </div>
           </div>
         </div>
+        <DraftKingsOddsPanel limit={6} />
       </div>
       {selectedMatch && (
         <BracketMatchModal
