@@ -86,6 +86,21 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     });
   }, [getEloRating]);
 
+  const refreshDraftKingsOdds = useCallback(async () => {
+    if (draftKingsOdds || draftKingsLoading) return;
+    setDraftKingsLoading(true);
+    setDraftKingsError(null);
+    try {
+      const odds = await fetchDraftKingsOdds();
+      setDraftKingsOdds(odds.outcomes);
+      setDraftKingsAsOf(odds.asOf);
+    } catch (error) {
+      setDraftKingsError(error instanceof Error ? error.message : 'Unable to load DraftKings odds');
+    } finally {
+      setDraftKingsLoading(false);
+    }
+  }, [draftKingsLoading, draftKingsOdds]);
+
   const rankStandingsByDraftKings = useCallback(() => {
     if (!draftKingsOdds) {
       refreshDraftKingsOdds();
@@ -153,21 +168,6 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setEloLoading(false);
     }
   }, []);
-
-  const refreshDraftKingsOdds = useCallback(async () => {
-    if (draftKingsOdds || draftKingsLoading) return;
-    setDraftKingsLoading(true);
-    setDraftKingsError(null);
-    try {
-      const odds = await fetchDraftKingsOdds();
-      setDraftKingsOdds(odds.outcomes);
-      setDraftKingsAsOf(odds.asOf);
-    } catch (error) {
-      setDraftKingsError(error instanceof Error ? error.message : 'Unable to load DraftKings odds');
-    } finally {
-      setDraftKingsLoading(false);
-    }
-  }, [draftKingsLoading, draftKingsOdds]);
 
   useEffect(() => {
     refreshEloRatings();
