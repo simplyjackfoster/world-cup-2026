@@ -4,9 +4,9 @@ export type Team =
   | 'Mexico'
   | 'South Africa'
   | 'South Korea'
-  | 'European Playoff D winner'
+  | 'Denmark/North Macedonia/Czechia/Republic of Ireland'
   | 'Canada'
-  | 'European Playoff A winner'
+  | 'Italy/Northern Ireland/Wales/Bosnia and Herzegovina'
   | 'Qatar'
   | 'Switzerland'
   | 'Brazil'
@@ -16,14 +16,14 @@ export type Team =
   | 'United States'
   | 'Paraguay'
   | 'Australia'
-  | 'European Playoff C winner'
+  | 'Turkey/Romania/Slovakia/Kosovo'
   | 'Germany'
   | 'Curaçao'
   | 'Ivory Coast'
   | 'Ecuador'
   | 'Netherlands'
   | 'Japan'
-  | 'European Playoff B winner'
+  | 'Ukraine/Sweden/Poland/Albania'
   | 'Tunisia'
   | 'Belgium'
   | 'Egypt'
@@ -35,14 +35,14 @@ export type Team =
   | 'Uruguay'
   | 'France'
   | 'Senegal'
-  | 'Intercontinental Playoff 2 winner'
+  | 'Bolivia/Suriname/Iraq'
   | 'Norway'
   | 'Argentina'
   | 'Algeria'
   | 'Austria'
   | 'Jordan'
   | 'Portugal'
-  | 'Intercontinental Playoff 1 winner'
+  | 'New Caledonia/Jamaica/DR Congo'
   | 'Uzbekistan'
   | 'Colombia'
   | 'England'
@@ -58,17 +58,23 @@ export interface Group {
 }
 
 export const GROUPS: Group[] = [
-  { id: 'A', teams: ['Mexico', 'South Africa', 'South Korea', 'European Playoff D winner'] },
-  { id: 'B', teams: ['Canada', 'European Playoff A winner', 'Qatar', 'Switzerland'] },
+  {
+    id: 'A',
+    teams: ['Mexico', 'South Africa', 'South Korea', 'Denmark/North Macedonia/Czechia/Republic of Ireland'],
+  },
+  {
+    id: 'B',
+    teams: ['Canada', 'Italy/Northern Ireland/Wales/Bosnia and Herzegovina', 'Qatar', 'Switzerland'],
+  },
   { id: 'C', teams: ['Brazil', 'Morocco', 'Haiti', 'Scotland'] },
-  { id: 'D', teams: ['United States', 'Paraguay', 'Australia', 'European Playoff C winner'] },
+  { id: 'D', teams: ['United States', 'Paraguay', 'Australia', 'Turkey/Romania/Slovakia/Kosovo'] },
   { id: 'E', teams: ['Germany', 'Curaçao', 'Ivory Coast', 'Ecuador'] },
-  { id: 'F', teams: ['Netherlands', 'Japan', 'European Playoff B winner', 'Tunisia'] },
+  { id: 'F', teams: ['Netherlands', 'Japan', 'Ukraine/Sweden/Poland/Albania', 'Tunisia'] },
   { id: 'G', teams: ['Belgium', 'Egypt', 'Iran', 'New Zealand'] },
   { id: 'H', teams: ['Spain', 'Cape Verde', 'Saudi Arabia', 'Uruguay'] },
-  { id: 'I', teams: ['France', 'Senegal', 'Intercontinental Playoff 2 winner', 'Norway'] },
+  { id: 'I', teams: ['France', 'Senegal', 'Bolivia/Suriname/Iraq', 'Norway'] },
   { id: 'J', teams: ['Argentina', 'Algeria', 'Austria', 'Jordan'] },
-  { id: 'K', teams: ['Portugal', 'Intercontinental Playoff 1 winner', 'Uzbekistan', 'Colombia'] },
+  { id: 'K', teams: ['Portugal', 'New Caledonia/Jamaica/DR Congo', 'Uzbekistan', 'Colombia'] },
   { id: 'L', teams: ['England', 'Croatia', 'Ghana', 'Panama'] },
 ];
 
@@ -112,12 +118,12 @@ export interface Fixture {
 
 const TEAM_ALIASES: Record<string, Team> = {
   usa: 'United States',
-  'uefa playoff winner a': 'European Playoff A winner',
-  'uefa playoff winner b': 'European Playoff B winner',
-  'uefa playoff winner c': 'European Playoff C winner',
-  'uefa playoff winner d': 'European Playoff D winner',
-  'intercontinental playoff winner 1': 'Intercontinental Playoff 1 winner',
-  'intercontinental playoff winner 2': 'Intercontinental Playoff 2 winner',
+  'uefa playoff winner a': 'Italy/Northern Ireland/Wales/Bosnia and Herzegovina',
+  'uefa playoff winner b': 'Ukraine/Sweden/Poland/Albania',
+  'uefa playoff winner c': 'Turkey/Romania/Slovakia/Kosovo',
+  'uefa playoff winner d': 'Denmark/North Macedonia/Czechia/Republic of Ireland',
+  'intercontinental playoff winner 1': 'New Caledonia/Jamaica/DR Congo',
+  'intercontinental playoff winner 2': 'Bolivia/Suriname/Iraq',
 };
 
 const allTeams: Team[] = GROUPS.flatMap((group) => group.teams);
