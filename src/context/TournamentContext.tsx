@@ -35,6 +35,33 @@ interface TournamentContextValue {
 
 const DEFAULT_ELO = 1200;
 
+const sanitizePredictions = (
+  predictions: PredictionsState,
+  standings: Record<GroupId, TeamStanding[]>,
+): PredictionsState => {
+  let nextPredictions: PredictionsState = { ...predictions };
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+
+    const { matches } = buildMatchesWithTeams(standings, nextPredictions);
+
+    matches.forEach((match) => {
+      const winner = nextPredictions[match.id];
+      const validWinner = winner && (winner === match.homeTeam || winner === match.awayTeam);
+
+      if (!validWinner && winner) {
+        const { [match.id]: _removed, ...rest } = nextPredictions;
+        nextPredictions = rest;
+        changed = true;
+      }
+    });
+  }
+
+  return nextPredictions;
+};
+
 const TournamentContext = createContext<TournamentContextValue | undefined>(undefined);
 
 export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -54,9 +81,12 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setStandings((prev) => ({ ...prev, [group]: newOrder }));
   }, []);
 
-  const setPrediction = useCallback((matchId: string, team: Team) => {
-    setPredictions((prev) => ({ ...prev, [matchId]: team }));
-  }, []);
+  const setPrediction = useCallback(
+    (matchId: string, team: Team) => {
+      setPredictions((prev) => sanitizePredictions({ ...prev, [matchId]: team }, standings));
+    },
+    [standings],
+  );
 
   const getEloRating = useCallback((team: Team) => eloRatings[team] ?? DEFAULT_ELO, [eloRatings]);
   const getDraftKingsPrice = useCallback(
@@ -172,6 +202,10 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     refreshEloRatings();
   }, [refreshEloRatings]);
+
+  useEffect(() => {
+    setPredictions((prev) => sanitizePredictions(prev, standings));
+  }, [standings]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => refreshDraftKingsOdds(), 750);
