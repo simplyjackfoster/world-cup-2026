@@ -3,10 +3,11 @@ import { useTournament } from '../context/TournamentContext';
 
 const formatPrice = (price: number) => (price > 0 ? `+${price.toLocaleString()}` : price.toLocaleString());
 
-const DraftKingsOddsPanel: React.FC<{ limit?: number }> = ({ limit = 12 }) => {
+const DraftKingsOddsPanel: React.FC<{ limit?: number | null }> = ({ limit = null }) => {
   const { draftKingsOdds, draftKingsLoading, draftKingsError, draftKingsAsOf, refreshDraftKingsOdds } = useTournament();
 
-  const shortlist = draftKingsOdds?.slice(0, limit) ?? [];
+  const shortlist =
+    typeof limit === 'number' && limit > 0 ? draftKingsOdds?.slice(0, limit) ?? [] : draftKingsOdds ?? [];
 
   return (
     <div className="bg-pitch border border-slate-800 rounded-2xl p-4 shadow-card">
@@ -33,7 +34,7 @@ const DraftKingsOddsPanel: React.FC<{ limit?: number }> = ({ limit = 12 }) => {
       )}
 
       {!draftKingsLoading && !draftKingsError && shortlist.length > 0 && (
-        <div className="mt-3 space-y-2">
+        <div className="mt-3 space-y-2 max-h-96 overflow-y-auto pr-1">
           {shortlist.map((entry, index) => {
             const meta = teamMeta[entry.team];
             return (

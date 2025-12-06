@@ -14,8 +14,10 @@ interface TournamentContextValue {
   predictions: PredictionsState;
   setPrediction: (matchId: string, team: Team) => void;
   pickBracketByElo: () => void;
+  pickBracketByDraftKings: () => void;
   randomizeBracket: () => void;
   rankStandingsByElo: () => void;
+  rankStandingsByDraftKings: () => void;
   randomizeStandings: () => void;
   eloRatings: Record<string, number>;
   eloLoading: boolean;
@@ -57,6 +59,10 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   const getEloRating = useCallback((team: Team) => eloRatings[team] ?? DEFAULT_ELO, [eloRatings]);
+  const getDraftKingsPrice = useCallback(
+    (team: Team) => draftKingsOdds?.find((entry) => entry.team === team)?.price ?? Number.POSITIVE_INFINITY,
+    [draftKingsOdds],
+  );
 
   const randomizeStandings = useCallback(() => {
     setStandings((prev) => {
@@ -79,6 +85,22 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return next;
     });
   }, [getEloRating]);
+
+  const rankStandingsByDraftKings = useCallback(() => {
+    if (!draftKingsOdds) {
+      refreshDraftKingsOdds();
+      return;
+    }
+
+    setStandings((prev) => {
+      const next: Record<GroupId, TeamStanding[]> = { ...prev };
+      GROUPS.forEach((group) => {
+        const sorted = [...prev[group.id]].sort((a, b) => getDraftKingsPrice(a.team) - getDraftKingsPrice(b.team));
+        next[group.id] = sorted;
+      });
+      return next;
+    });
+  }, [draftKingsOdds, getDraftKingsPrice, refreshDraftKingsOdds]);
 
   const fillBracket = useCallback(
     (chooseWinner: (home: Team, away: Team) => Team) => {
@@ -108,6 +130,14 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     () => fillBracket((home, away) => (getEloRating(home) >= getEloRating(away) ? home : away)),
     [fillBracket, getEloRating],
   );
+  const pickBracketByDraftKings = useCallback(() => {
+    if (!draftKingsOdds) {
+      refreshDraftKingsOdds();
+      return;
+    }
+
+    fillBracket((home, away) => (getDraftKingsPrice(home) <= getDraftKingsPrice(away) ? home : away));
+  }, [draftKingsOdds, fillBracket, getDraftKingsPrice, refreshDraftKingsOdds]);
   const randomizeBracket = useCallback(() => fillBracket((home, away) => (Math.random() < 0.5 ? home : away)), [fillBracket]);
 
   const refreshEloRatings = useCallback(async () => {
@@ -165,8 +195,10 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       favorites,
       toggleFavorite,
       pickBracketByElo,
+      pickBracketByDraftKings,
       randomizeBracket,
       rankStandingsByElo,
+      rankStandingsByDraftKings,
       randomizeStandings,
       eloRatings,
       eloLoading,
@@ -187,8 +219,10 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       favorites,
       toggleFavorite,
       pickBracketByElo,
+      pickBracketByDraftKings,
       randomizeBracket,
       rankStandingsByElo,
+      rankStandingsByDraftKings,
       randomizeStandings,
       eloRatings,
       eloLoading,
