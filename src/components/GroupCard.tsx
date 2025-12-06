@@ -12,20 +12,28 @@ export default function GroupCard({ id, onClick }: Props) {
   const table = standings[id];
 
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className="w-full text-left bg-pitch rounded-2xl shadow-card border border-slate-800/80 hover:border-accent/50 transition"
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+      className="w-full text-left bg-pitch rounded-2xl shadow-card border border-slate-800/80 hover:border-accent/50 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
     >
       <div className="p-4 flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Group</p>
           <h3 className="text-2xl font-bold">{id}</h3>
         </div>
-        <div className="px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold">Tap for fixtures</div>
+        <div className="px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold">View fixtures</div>
       </div>
       <div className="px-4 pb-4">
-        <GroupTable standings={table} compact />
+        <GroupTable standings={table} compact groupId={id} enableDrag />
       </div>
-    </button>
+    </div>
   );
 }
