@@ -139,7 +139,6 @@ export default function Bracket() {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-slate-400">
                       <span>{meta?.confed ?? '—'}</span>
-                      {team && <span className="text-[10px] uppercase tracking-wide">Tap to pick</span>}
                     </div>
                   </button>
                   {i === 0 && <div className="h-2" />}

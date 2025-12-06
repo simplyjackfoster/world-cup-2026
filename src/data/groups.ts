@@ -1,3 +1,5 @@
+import { HOST_CITIES } from './hostCities';
+
 export type Team =
   | 'Mexico'
   | 'South Africa'
@@ -108,28 +110,48 @@ export interface Fixture {
   country: string;
 }
 
-export const fixtures: Fixture[] = GROUPS.flatMap((group, idx) => {
-  const [a, b, c, d] = group.teams;
-  return [
-    {
-      id: `${group.id}-1`,
-      group: group.id,
-      home: a,
-      away: b,
-      date: new Date(2026, 5, 10 + idx, 16).toISOString(),
-      city: 'New York',
-      stadium: 'MetLife Stadium',
-      country: 'USA',
-    },
-    {
-      id: `${group.id}-2`,
-      group: group.id,
-      home: c,
-      away: d,
-      date: new Date(2026, 5, 12 + idx, 14).toISOString(),
-      city: 'Los Angeles',
-      stadium: 'SoFi Stadium',
-      country: 'USA',
-    },
-  ];
-});
+const TEAM_ALIASES: Record<string, Team> = {
+  usa: 'United States',
+  'uefa playoff winner a': 'European Playoff A winner',
+  'uefa playoff winner b': 'European Playoff B winner',
+  'uefa playoff winner c': 'European Playoff C winner',
+  'uefa playoff winner d': 'European Playoff D winner',
+  'intercontinental playoff winner 1': 'Intercontinental Playoff 1 winner',
+  'intercontinental playoff winner 2': 'Intercontinental Playoff 2 winner',
+};
+
+const allTeams: Team[] = GROUPS.flatMap((group) => group.teams);
+
+const normalizeTeamName = (name: string): Team => {
+  const normalized = name.trim().toLowerCase();
+  if (TEAM_ALIASES[normalized]) return TEAM_ALIASES[normalized];
+
+  const exactMatch = allTeams.find((team) => team.toLowerCase() === normalized);
+  if (exactMatch) return exactMatch;
+
+  throw new Error(`Unknown team name in host city data: ${name}`);
+};
+
+const hostGroupMatches = Object.values(HOST_CITIES)
+  .flatMap((city) => city.matches)
+  .filter((match) => match.stage === 'GROUP' && match.group)
+  .sort((a, b) => (a.kickoffLocal ?? '').localeCompare(b.kickoffLocal ?? ''));
+
+const usedMatchNumbers = new Set<number>();
+
+export const fixtures: Fixture[] = hostGroupMatches
+  .filter((match) => {
+    if (usedMatchNumbers.has(match.fifaMatchNumber)) return false;
+    usedMatchNumbers.add(match.fifaMatchNumber);
+    return true;
+  })
+  .map((match) => ({
+    id: `${match.group}-${match.fifaMatchNumber}`,
+    group: match.group as GroupId,
+    home: normalizeTeamName(match.homeTeamName),
+    away: normalizeTeamName(match.awayTeamName),
+    date: match.kickoffLocal ?? '',
+    city: match.city,
+    stadium: match.stadiumTraditionalName || match.stadiumGenericName,
+    country: match.country,
+  }));
