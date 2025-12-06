@@ -16,7 +16,7 @@ export const stageLabel: Record<Stage, string> = {
 };
 
 export default function Bracket() {
-  const { standings, predictions, setPrediction, mode } = useTournament();
+  const { standings, predictions, setPrediction } = useTournament();
   const [selectedMatch, setSelectedMatch] = useState<ReturnType<typeof buildMatchesWithTeams>['matches'][number] | null>(
     null,
   );
@@ -24,12 +24,7 @@ export default function Bracket() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const matchRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { matches, predictions: autoPred } = useMemo(
-    () => buildMatchesWithTeams(mode, standings, predictions),
-    [mode, standings, predictions],
-  );
-
-  const combinedPredictions = mode === 'results' ? { ...autoPred, ...predictions } : predictions;
+  const { matches } = useMemo(() => buildMatchesWithTeams(standings, predictions), [standings, predictions]);
 
   const findNextMatch = (matchId: string) =>
     BRACKET_SLOTS.find((slot) => slot.home.source === `Winner ${matchId}` || slot.away.source === `Winner ${matchId}`);
@@ -83,7 +78,7 @@ export default function Bracket() {
     };
   }, [matches]);
 
-  const winningTeam = (matchId: string) => combinedPredictions[matchId];
+  const winningTeam = (matchId: string) => predictions[matchId];
 
   const matchesByStage = useMemo(
     () =>
@@ -144,7 +139,7 @@ export default function Bracket() {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-slate-400">
                       <span>{meta?.confed ?? '—'}</span>
-                      {mode === 'predictions' && team && <span className="text-[10px] uppercase tracking-wide">Tap to pick</span>}
+                      {team && <span className="text-[10px] uppercase tracking-wide">Tap to pick</span>}
                     </div>
                   </button>
                   {i === 0 && <div className="h-2" />}

@@ -8,7 +8,7 @@ interface DragState {
 }
 
 export default function GroupRankingsPanel() {
-  const { standings, updateStandings, mode, setMode } = useTournament();
+  const { standings, updateStandings } = useTournament();
   const [dragging, setDragging] = useState<DragState | null>(null);
   const [dragTarget, setDragTarget] = useState<{ group: GroupId; index: number } | null>(null);
 
@@ -58,20 +58,6 @@ export default function GroupRankingsPanel() {
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Group rankings</p>
           <h3 className="text-xl font-semibold">Drag to set the order</h3>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <button
-            onClick={() => setMode('results')}
-            className={`px-3 py-1 rounded-full ${mode === 'results' ? 'bg-accent text-night' : 'bg-slate-800'}`}
-          >
-            Results mode
-          </button>
-          <button
-            onClick={() => setMode('predictions')}
-            className={`px-3 py-1 rounded-full ${mode === 'predictions' ? 'bg-gold text-night' : 'bg-slate-800'}`}
-          >
-            Prediction mode
-          </button>
         </div>
       </div>
       <p className="text-sm text-slate-300 mb-3">
