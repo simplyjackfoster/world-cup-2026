@@ -22,10 +22,15 @@ export default function Bracket() {
     predictions,
     setPrediction,
     pickBracketByElo,
+    pickBracketByDraftKings,
     randomizeBracket,
     eloLoading,
     eloError,
     eloAsOf,
+    draftKingsLoading,
+    draftKingsError,
+    draftKingsAsOf,
+    refreshDraftKingsOdds,
   } = useTournament();
   const [selectedMatch, setSelectedMatch] = useState<ReturnType<typeof buildMatchesWithTeams>['matches'][number] | null>(
     null,
@@ -177,6 +182,13 @@ export default function Bracket() {
             Select by ELO
           </button>
           <button
+            className="px-3 py-2 rounded-lg bg-emerald-400 text-night text-sm font-semibold disabled:opacity-60"
+            onClick={pickBracketByDraftKings}
+            disabled={draftKingsLoading}
+          >
+            Select by DraftKings
+          </button>
+          <button
             className="px-3 py-2 rounded-lg border border-slate-700 bg-slate-900 text-sm font-semibold hover:border-slate-600"
             onClick={randomizeBracket}
           >
@@ -190,6 +202,16 @@ export default function Bracket() {
           {!eloLoading && eloError && `ELO snapshot unavailable right now: ${eloError}`}
           {!eloLoading && !eloError &&
             `Tap a team to advance, or auto-pick with ELO (as of ${eloAsOf ?? 'Dec 5, 2025'}) or a full random bracket above.`}
+          {draftKingsLoading && ' DraftKings outrights are loading…'}
+          {!draftKingsLoading && draftKingsError && (
+            <>
+              {' '}DraftKings outrights unavailable: {draftKingsError}{' '}
+              <button className="underline text-accent" onClick={refreshDraftKingsOdds}>
+                Retry
+              </button>
+            </>
+          )}
+          {!draftKingsLoading && draftKingsAsOf && ` DraftKings odds as of ${draftKingsAsOf}.`}
         </p>
         <DraftKingsOddsPanel limit={6} />
       </div>
