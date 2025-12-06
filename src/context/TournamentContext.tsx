@@ -17,7 +17,7 @@ interface TournamentContextValue {
   randomizeBracket: () => void;
   rankStandingsByElo: () => void;
   randomizeStandings: () => void;
-  eloRatings: Record<Team, number>;
+  eloRatings: Record<string, number>;
   eloLoading: boolean;
   eloError: string | null;
   refreshEloRatings: () => void;
@@ -39,7 +39,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [standings, setStandings] = useState<Record<GroupId, TeamStanding[]>>(initialStandings);
   const [predictions, setPredictions] = useState<PredictionsState>({});
   const [favorites, setFavorites] = useState<Team[]>(['Mexico', 'United States']);
-  const [eloRatings, setEloRatings] = useState<Record<Team, number>>({});
+  const [eloRatings, setEloRatings] = useState<Record<string, number>>({});
   const [eloLoading, setEloLoading] = useState(false);
   const [eloError, setEloError] = useState<string | null>(null);
   const [eloAsOf, setEloAsOf] = useState<string | null>(null);
