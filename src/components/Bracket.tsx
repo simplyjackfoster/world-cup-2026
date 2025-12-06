@@ -16,7 +16,15 @@ export const stageLabel: Record<Stage, string> = {
 };
 
 export default function Bracket() {
-  const { standings, predictions, setPrediction } = useTournament();
+  const {
+    standings,
+    predictions,
+    setPrediction,
+    pickBracketByElo,
+    randomizeBracket,
+    eloLoading,
+    eloError,
+  } = useTournament();
   const [selectedMatch, setSelectedMatch] = useState<ReturnType<typeof buildMatchesWithTeams>['matches'][number] | null>(
     null,
   );
@@ -153,13 +161,33 @@ export default function Bracket() {
 
   return (
     <div className="mt-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Knockout view</p>
           <h2 className="text-2xl font-semibold">Interactive Bracket</h2>
         </div>
-        <p className="text-xs text-slate-300">Tap a team to advance; click the card for full match details.</p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            className="px-3 py-2 rounded-lg bg-accent text-night text-sm font-semibold disabled:opacity-60"
+            onClick={pickBracketByElo}
+            disabled={eloLoading}
+          >
+            Select by ELO
+          </button>
+          <button
+            className="px-3 py-2 rounded-lg border border-slate-700 bg-slate-900 text-sm font-semibold hover:border-slate-600"
+            onClick={randomizeBracket}
+          >
+            Randomize bracket
+          </button>
+        </div>
       </div>
+      <p className="text-xs text-slate-300">
+        {eloLoading && 'Loading ELO data for smart picks…'}
+        {!eloLoading && eloError && `ELO feed unavailable right now: ${eloError}`}
+        {!eloLoading && !eloError &&
+          'Tap a team to advance, or auto-pick with ELO or a full random bracket above.'}
+      </p>
       <div className="overflow-x-auto pb-10">
         <div ref={canvasRef} className="relative w-full">
           <svg className="absolute inset-0 w-full h-full pointer-events-none -z-10" aria-hidden>

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
-import { BRACKET_SLOTS, teamMeta } from '../data/bracket';
-import { fixtures, GroupId, initialStandings, Team, TeamStanding } from '../data/groups';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { BRACKET_SLOTS, Stage, teamMeta } from '../data/bracket';
+import { fixtures, GROUPS, GroupId, initialStandings, Team, TeamStanding } from '../data/groups';
+import { fetchEloRatings, mapEloNameToTeam } from '../lib/elo';
 
 interface PredictionsState {
   [matchId: string]: Team | null;
@@ -11,9 +12,19 @@ interface TournamentContextValue {
   updateStandings: (group: GroupId, newOrder: TeamStanding[]) => void;
   predictions: PredictionsState;
   setPrediction: (matchId: string, team: Team) => void;
+  pickBracketByElo: () => void;
+  randomizeBracket: () => void;
+  rankStandingsByElo: () => void;
+  randomizeStandings: () => void;
+  eloRatings: Record<Team, number>;
+  eloLoading: boolean;
+  eloError: string | null;
+  refreshEloRatings: () => void;
   favorites: Team[];
   toggleFavorite: (team: Team) => void;
 }
+
+const DEFAULT_ELO = 1200;
 
 const TournamentContext = createContext<TournamentContextValue | undefined>(undefined);
 
@@ -21,26 +32,130 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [standings, setStandings] = useState<Record<GroupId, TeamStanding[]>>(initialStandings);
   const [predictions, setPredictions] = useState<PredictionsState>({});
   const [favorites, setFavorites] = useState<Team[]>(['Mexico', 'United States']);
+  const [eloRatings, setEloRatings] = useState<Record<Team, number>>({});
+  const [eloLoading, setEloLoading] = useState(false);
+  const [eloError, setEloError] = useState<string | null>(null);
 
-  const updateStandings = (group: GroupId, newOrder: TeamStanding[]) => {
+  const updateStandings = useCallback((group: GroupId, newOrder: TeamStanding[]) => {
     setStandings((prev) => ({ ...prev, [group]: newOrder }));
-  };
+  }, []);
 
-  const setPrediction = (matchId: string, team: Team) => {
+  const setPrediction = useCallback((matchId: string, team: Team) => {
     setPredictions((prev) => ({ ...prev, [matchId]: team }));
-  };
+  }, []);
 
-  const toggleFavorite = (team: Team) => {
+  const getEloRating = useCallback((team: Team) => eloRatings[team] ?? DEFAULT_ELO, [eloRatings]);
+
+  const randomizeStandings = useCallback(() => {
+    setStandings((prev) => {
+      const next: Record<GroupId, TeamStanding[]> = { ...prev };
+      GROUPS.forEach((group) => {
+        const shuffled = [...prev[group.id]].sort(() => Math.random() - 0.5);
+        next[group.id] = shuffled;
+      });
+      return next;
+    });
+  }, []);
+
+  const rankStandingsByElo = useCallback(() => {
+    setStandings((prev) => {
+      const next: Record<GroupId, TeamStanding[]> = { ...prev };
+      GROUPS.forEach((group) => {
+        const sorted = [...prev[group.id]].sort((a, b) => getEloRating(b.team) - getEloRating(a.team));
+        next[group.id] = sorted;
+      });
+      return next;
+    });
+  }, [getEloRating]);
+
+  const fillBracket = useCallback(
+    (chooseWinner: (home: Team, away: Team) => Team) => {
+      const orderedStages: Stage[] = ['R32', 'R16', 'QF', 'SF', 'F', '3P'];
+
+      setPredictions((prev) => {
+        let nextPredictions: PredictionsState = { ...prev };
+
+        orderedStages.forEach((stage) => {
+          const { matches } = buildMatchesWithTeams(standings, nextPredictions);
+          matches
+            .filter((match) => match.stage === stage)
+            .forEach((match) => {
+              if (!match.homeTeam || !match.awayTeam) return;
+              const winner = chooseWinner(match.homeTeam, match.awayTeam);
+              nextPredictions = { ...nextPredictions, [match.id]: winner };
+            });
+        });
+
+        return nextPredictions;
+      });
+    },
+    [standings],
+  );
+
+  const pickBracketByElo = useCallback(
+    () => fillBracket((home, away) => (getEloRating(home) >= getEloRating(away) ? home : away)),
+    [fillBracket, getEloRating],
+  );
+  const randomizeBracket = useCallback(() => fillBracket((home, away) => (Math.random() < 0.5 ? home : away)), [fillBracket]);
+
+  const refreshEloRatings = useCallback(async () => {
+    setEloLoading(true);
+    setEloError(null);
+    try {
+      const data = await fetchEloRatings(mapEloNameToTeam);
+      setEloRatings(data);
+    } catch (error) {
+      setEloError(error instanceof Error ? error.message : 'Unable to load ELO ratings');
+    } finally {
+      setEloLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshEloRatings();
+  }, [refreshEloRatings]);
+
+  const toggleFavorite = useCallback((team: Team) => {
     setFavorites((prev) => {
       if (prev.includes(team)) return prev.filter((t) => t !== team);
       if (prev.length >= 3) return prev;
       return [...prev, team];
     });
-  };
+  }, []);
 
   const value = useMemo(
-    () => ({ standings, updateStandings, predictions, setPrediction, favorites, toggleFavorite }),
-    [favorites, predictions, standings],
+    () => ({
+      standings,
+      updateStandings,
+      predictions,
+      setPrediction,
+      favorites,
+      toggleFavorite,
+      pickBracketByElo,
+      randomizeBracket,
+      rankStandingsByElo,
+      randomizeStandings,
+      eloRatings,
+      eloLoading,
+      eloError,
+      refreshEloRatings,
+    }),
+    [
+      standings,
+      updateStandings,
+      predictions,
+      setPrediction,
+      favorites,
+      toggleFavorite,
+      pickBracketByElo,
+      randomizeBracket,
+      rankStandingsByElo,
+      randomizeStandings,
+      eloRatings,
+      eloLoading,
+      eloError,
+      refreshEloRatings,
+    ],
   );
 
   return <TournamentContext.Provider value={value}>{children}</TournamentContext.Provider>;
@@ -95,8 +210,19 @@ export const resolveSource = (
     return predictions[key] ?? null;
   }
   if (loserMatch) {
-    // Derive loser by knowing previous winners; left null until results arrive from a live API.
-    return null;
+    const [, stage, index] = loserMatch;
+    const key = `${stage}-${index}`;
+    const match = BRACKET_SLOTS.find((slot) => slot.id === key);
+
+    if (!match) return null;
+
+    const homeTeam = resolveSource(match.home.source, standings, predictions);
+    const awayTeam = resolveSource(match.away.source, standings, predictions);
+    const winner = predictions[key];
+
+    if (!homeTeam || !awayTeam || !winner) return null;
+
+    return winner === homeTeam ? awayTeam : homeTeam;
   }
   return null;
 };
