@@ -13,6 +13,9 @@ interface TournamentContextValue {
   updateStandings: (group: GroupId, newOrder: TeamStanding[]) => void;
   predictions: PredictionsState;
   setPrediction: (matchId: string, team: Team) => void;
+  resetPredictions: () => void;
+  undoLastPrediction: () => void;
+  canUndoPrediction: boolean;
   pickBracketByElo: () => void;
   pickBracketByDraftKings: () => void;
   randomizeBracket: () => void;
@@ -67,6 +70,7 @@ const TournamentContext = createContext<TournamentContextValue | undefined>(unde
 export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [standings, setStandings] = useState<Record<GroupId, TeamStanding[]>>(initialStandings);
   const [predictions, setPredictions] = useState<PredictionsState>({});
+  const [predictionHistory, setPredictionHistory] = useState<PredictionsState[]>([]);
   const [favorites, setFavorites] = useState<Team[]>(['Mexico', 'United States']);
   const [eloRatings, setEloRatings] = useState<Record<string, number>>({});
   const [eloLoading, setEloLoading] = useState(false);
@@ -81,12 +85,37 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setStandings((prev) => ({ ...prev, [group]: newOrder }));
   }, []);
 
+  const pushHistory = useCallback((snapshot: PredictionsState) => {
+    setPredictionHistory((prev) => [...prev.slice(-4), snapshot]);
+  }, []);
+
   const setPrediction = useCallback(
     (matchId: string, team: Team) => {
-      setPredictions((prev) => sanitizePredictions({ ...prev, [matchId]: team }, standings));
+      setPredictions((prev) => {
+        pushHistory(prev);
+        return sanitizePredictions({ ...prev, [matchId]: team }, standings);
+      });
     },
-    [standings],
+    [pushHistory, standings],
   );
+
+  const resetPredictions = useCallback(() => {
+    setPredictions((prev) => {
+      pushHistory(prev);
+      return {};
+    });
+  }, [pushHistory]);
+
+  const undoLastPrediction = useCallback(() => {
+    setPredictionHistory((history) => {
+      const previous = history[history.length - 1];
+      if (!previous) return history;
+      setPredictions(sanitizePredictions(previous, standings));
+      return history.slice(0, -1);
+    });
+  }, [standings]);
+
+  const canUndoPrediction = predictionHistory.length > 0;
 
   const getEloRating = useCallback((team: Team) => eloRatings[team] ?? DEFAULT_ELO, [eloRatings]);
   const getDraftKingsPrice = useCallback(
@@ -152,6 +181,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const orderedStages: Stage[] = ['R32', 'R16', 'QF', 'SF', 'F', '3P'];
 
       setPredictions((prev) => {
+        pushHistory(prev);
         let nextPredictions: PredictionsState = { ...prev };
 
         orderedStages.forEach((stage) => {
@@ -168,7 +198,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         return nextPredictions;
       });
     },
-    [standings],
+    [pushHistory, standings],
   );
 
   const pickBracketByElo = useCallback(
@@ -226,6 +256,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       updateStandings,
       predictions,
       setPrediction,
+      resetPredictions,
+      undoLastPrediction,
+      canUndoPrediction,
       favorites,
       toggleFavorite,
       pickBracketByElo,
@@ -268,6 +301,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       draftKingsError,
       draftKingsAsOf,
       refreshDraftKingsOdds,
+      resetPredictions,
+      undoLastPrediction,
+      canUndoPrediction,
     ],
   );
 
