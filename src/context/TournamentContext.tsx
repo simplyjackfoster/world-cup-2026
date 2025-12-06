@@ -1,7 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { BRACKET_SLOTS, Stage, teamMeta } from '../data/bracket';
 import { fixtures, GROUPS, GroupId, initialStandings, Team, TeamStanding } from '../data/groups';
-import { fetchEloRatings, mapEloNameToTeam } from '../lib/elo';
+import { getStaticEloRatings } from '../lib/elo';
+import { fetchDraftKingsOdds } from '../lib/odds';
 
 interface PredictionsState {
   [matchId: string]: Team | null;
@@ -20,6 +21,12 @@ interface TournamentContextValue {
   eloLoading: boolean;
   eloError: string | null;
   refreshEloRatings: () => void;
+  eloAsOf: string | null;
+  draftKingsOdds: { team: Team; price: number }[] | null;
+  draftKingsLoading: boolean;
+  draftKingsError: string | null;
+  draftKingsAsOf: string | null;
+  refreshDraftKingsOdds: () => void;
   favorites: Team[];
   toggleFavorite: (team: Team) => void;
 }
@@ -35,6 +42,11 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [eloRatings, setEloRatings] = useState<Record<Team, number>>({});
   const [eloLoading, setEloLoading] = useState(false);
   const [eloError, setEloError] = useState<string | null>(null);
+  const [eloAsOf, setEloAsOf] = useState<string | null>(null);
+  const [draftKingsOdds, setDraftKingsOdds] = useState<{ team: Team; price: number }[] | null>(null);
+  const [draftKingsAsOf, setDraftKingsAsOf] = useState<string | null>(null);
+  const [draftKingsLoading, setDraftKingsLoading] = useState(false);
+  const [draftKingsError, setDraftKingsError] = useState<string | null>(null);
 
   const updateStandings = useCallback((group: GroupId, newOrder: TeamStanding[]) => {
     setStandings((prev) => ({ ...prev, [group]: newOrder }));
@@ -102,8 +114,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setEloLoading(true);
     setEloError(null);
     try {
-      const data = await fetchEloRatings(mapEloNameToTeam);
-      setEloRatings(data);
+      const { ratings, asOf } = await getStaticEloRatings();
+      setEloRatings(ratings);
+      setEloAsOf(asOf);
     } catch (error) {
       setEloError(error instanceof Error ? error.message : 'Unable to load ELO ratings');
     } finally {
@@ -111,9 +124,29 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, []);
 
+  const refreshDraftKingsOdds = useCallback(async () => {
+    if (draftKingsOdds || draftKingsLoading) return;
+    setDraftKingsLoading(true);
+    setDraftKingsError(null);
+    try {
+      const odds = await fetchDraftKingsOdds();
+      setDraftKingsOdds(odds.outcomes);
+      setDraftKingsAsOf(odds.asOf);
+    } catch (error) {
+      setDraftKingsError(error instanceof Error ? error.message : 'Unable to load DraftKings odds');
+    } finally {
+      setDraftKingsLoading(false);
+    }
+  }, [draftKingsLoading, draftKingsOdds]);
+
   useEffect(() => {
     refreshEloRatings();
   }, [refreshEloRatings]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => refreshDraftKingsOdds(), 750);
+    return () => window.clearTimeout(timer);
+  }, [refreshDraftKingsOdds]);
 
   const toggleFavorite = useCallback((team: Team) => {
     setFavorites((prev) => {
@@ -139,6 +172,12 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       eloLoading,
       eloError,
       refreshEloRatings,
+      eloAsOf,
+      draftKingsOdds,
+      draftKingsLoading,
+      draftKingsError,
+      draftKingsAsOf,
+      refreshDraftKingsOdds,
     }),
     [
       standings,
@@ -155,6 +194,12 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       eloLoading,
       eloError,
       refreshEloRatings,
+      eloAsOf,
+      draftKingsOdds,
+      draftKingsLoading,
+      draftKingsError,
+      draftKingsAsOf,
+      refreshDraftKingsOdds,
     ],
   );
 

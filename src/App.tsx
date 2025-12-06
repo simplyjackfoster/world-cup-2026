@@ -5,6 +5,7 @@ import HostCityExplorer from './components/HostCityExplorer';
 import MyTeams from './components/MyTeams';
 import GroupDetail from './components/GroupDetail';
 import GroupControls from './components/GroupControls';
+import DraftKingsOddsPanel from './components/DraftKingsOddsPanel';
 import { useState } from 'react';
 
 const navClasses = ({ isActive }: { isActive: boolean }) =>
@@ -55,6 +56,7 @@ function App() {
                   {selectedGroup && <GroupDetail groupId={selectedGroup} onClose={() => setSelectedGroup(null)} />}
                 </div>
                 <div className="space-y-4">
+                  <DraftKingsOddsPanel />
                   <MyTeams />
                 </div>
               </div>
