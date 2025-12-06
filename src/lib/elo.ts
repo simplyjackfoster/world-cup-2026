@@ -18,10 +18,10 @@ const TEAM_ALIASES: Record<string, Team> = {
   'cape verde islands': 'Cape Verde',
   'cape verde': 'Cape Verde',
   'saudi arabia': 'Saudi Arabia',
-  'uae playoff winner 1': 'Intercontinental Playoff 1 winner',
-  'uae playoff winner 2': 'Intercontinental Playoff 2 winner',
-  'intercontinental playoff 1 winner': 'Intercontinental Playoff 1 winner',
-  'intercontinental playoff 2 winner': 'Intercontinental Playoff 2 winner',
+  'uae playoff winner 1': 'New Caledonia/Jamaica/DR Congo',
+  'uae playoff winner 2': 'Bolivia/Suriname/Iraq',
+  'intercontinental playoff 1 winner': 'New Caledonia/Jamaica/DR Congo',
+  'intercontinental playoff 2 winner': 'Bolivia/Suriname/Iraq',
 };
 
 function normalizeName(value: string): string {
