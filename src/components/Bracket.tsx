@@ -20,6 +20,15 @@ export const stageLabel: Record<Stage, string> = {
 
 const knockoutStages: Stage[] = ['R32', 'R16', 'QF', 'SF'];
 
+const columnWidthClasses: Record<Stage, string> = {
+  R32: 'min-w-[210px] max-w-[230px]',
+  R16: 'min-w-[200px] max-w-[220px]',
+  QF: 'min-w-[190px] max-w-[210px]',
+  SF: 'min-w-[190px] max-w-[210px]',
+  '3P': 'min-w-[230px] max-w-[250px]',
+  F: 'min-w-[240px] max-w-[260px]',
+};
+
 type MatchShape = ReturnType<typeof buildMatchesWithTeams>['matches'][number];
 
 type ColumnMatch = {
@@ -30,12 +39,14 @@ const RoundColumn = ({
   stage,
   matches,
   renderMatch,
+  widthClass = '',
 }: {
   stage: Stage;
   matches: ColumnMatch[];
   renderMatch: (matchId: string) => JSX.Element;
+  widthClass?: string;
 }) => (
-  <div className="flex-1 min-w-[210px] max-w-[250px] space-y-3 shrink" aria-label={`${stageLabel[stage]} column`}>
+  <div className={`flex-1 space-y-3 shrink ${widthClass}`} aria-label={`${stageLabel[stage]} column`}>
     <p className="inline-flex rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-100">
       {stageLabel[stage]}
     </p>
@@ -308,6 +319,7 @@ export default function Bracket() {
                   key={`left-${stage}`}
                   stage={stage}
                   matches={splitStage(stage).left}
+                  widthClass={columnWidthClasses[stage]}
                   renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
                 />
               ))}
@@ -316,11 +328,13 @@ export default function Bracket() {
               <RoundColumn
                 stage="F"
                 matches={matchesByStage.F}
+                widthClass={columnWidthClasses.F}
                 renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
               />
               <RoundColumn
                 stage="3P"
                 matches={matchesByStage['3P']}
+                widthClass={columnWidthClasses['3P']}
                 renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
               />
               <div className="w-full rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-200">
@@ -357,6 +371,7 @@ export default function Bracket() {
                   key={`right-${stage}`}
                   stage={stage}
                   matches={splitStage(stage).right}
+                  widthClass={columnWidthClasses[stage]}
                   renderMatch={(id) => renderMatchCard(matches.find((m) => m.id === id)!)}
                 />
               ))}
