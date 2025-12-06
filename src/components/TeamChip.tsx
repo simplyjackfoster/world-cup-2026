@@ -24,6 +24,7 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
     'bg-accent/15 border-accent text-accent shadow-[0_0_0_1px_rgba(56,189,248,0.4)] hover:border-accent/80 focus-visible:outline-accent';
   const idleStyles = 'bg-slate-900/70 border-slate-800 hover:border-slate-700 text-slate-100';
   const disabledStyles = 'opacity-60 cursor-not-allowed';
+  const statusStyles = selected ? 'text-accent opacity-100' : 'text-transparent opacity-0';
 
   return (
     <button
@@ -44,7 +45,9 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
           </span>
         </div>
       </div>
-      {selected && <span className="text-[11px] font-bold uppercase text-accent">Advancing</span>}
+      <span className={`text-[11px] font-bold uppercase min-w-[80px] text-right ${statusStyles}`} aria-hidden={!selected}>
+        Advancing
+      </span>
     </button>
   );
 }
