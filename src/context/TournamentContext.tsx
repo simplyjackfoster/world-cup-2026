@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
-import { BRACKET_SLOTS, Stage, teamMeta } from '../data/bracket';
+import { BRACKET_SLOTS, teamMeta } from '../data/bracket';
 import { fixtures, GroupId, initialStandings, Team, TeamStanding } from '../data/groups';
 
 interface PredictionsState {
@@ -13,8 +13,6 @@ interface TournamentContextValue {
   setPrediction: (matchId: string, team: Team) => void;
   favorites: Team[];
   toggleFavorite: (team: Team) => void;
-  mode: 'results' | 'predictions';
-  setMode: (mode: 'results' | 'predictions') => void;
 }
 
 const TournamentContext = createContext<TournamentContextValue | undefined>(undefined);
@@ -23,7 +21,6 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [standings, setStandings] = useState<Record<GroupId, TeamStanding[]>>(initialStandings);
   const [predictions, setPredictions] = useState<PredictionsState>({});
   const [favorites, setFavorites] = useState<Team[]>(['Mexico', 'United States']);
-  const [mode, setMode] = useState<'results' | 'predictions'>('results');
 
   const updateStandings = (group: GroupId, newOrder: TeamStanding[]) => {
     setStandings((prev) => ({ ...prev, [group]: newOrder }));
@@ -42,8 +39,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const value = useMemo(
-    () => ({ standings, updateStandings, predictions, setPrediction, favorites, toggleFavorite, mode, setMode }),
-    [favorites, mode, predictions, standings],
+    () => ({ standings, updateStandings, predictions, setPrediction, favorites, toggleFavorite }),
+    [favorites, predictions, standings],
   );
 
   return <TournamentContext.Provider value={value}>{children}</TournamentContext.Provider>;
@@ -105,7 +102,6 @@ export const resolveSource = (
 };
 
 export const buildMatchesWithTeams = (
-  mode: 'results' | 'predictions',
   standings: Record<GroupId, TeamStanding[]>,
   predictions: PredictionsState,
 ) => {
@@ -119,19 +115,6 @@ export const buildMatchesWithTeams = (
       awayTeam,
     };
   });
-
-  // Auto-fill winners in results mode using higher pts + goal diff as a deterministic tiebreaker
-  if (mode === 'results') {
-    const autoPredictions: PredictionsState = {};
-    matches
-      .filter((m) => m.stage === 'R32')
-      .forEach((m) => {
-        const homeScore = Math.random();
-        const awayScore = Math.random();
-        autoPredictions[m.id] = (homeScore >= awayScore ? m.homeTeam : m.awayTeam) || null;
-      });
-    return { matches, predictions: autoPredictions };
-  }
 
   return { matches, predictions };
 };

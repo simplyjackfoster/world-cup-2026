@@ -84,15 +84,15 @@ export interface TeamStanding {
 export const initialStandings: Record<GroupId, TeamStanding[]> = Object.fromEntries(
   GROUPS.map((group) => [
     group.id,
-    group.teams.map((team, index) => ({
+    group.teams.map((team) => ({
       team,
-      mp: 3,
-      w: 1 + (index % 2),
-      d: index % 2 === 0 ? 1 : 0,
-      l: index === 0 ? 0 : 1,
-      gf: 2 + index,
-      ga: 1 + (index % 2),
-      pts: 3 * (1 + (index % 2)) + (index % 2 === 0 ? 1 : 0),
+      mp: 0,
+      w: 0,
+      d: 0,
+      l: 0,
+      gf: 0,
+      ga: 0,
+      pts: 0,
     })),
   ]),
 ) as Record<GroupId, TeamStanding[]>;
