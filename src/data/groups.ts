@@ -127,6 +127,8 @@ const TEAM_ALIASES: Record<string, Team> = {
   'intercontinental playoff winner 2': 'Bolivia/Suriname/Iraq',
   "cote d'ivoire": 'Ivory Coast',
   "côte d'ivoire": 'Ivory Coast',
+  'ir iran': 'Iran',
+  'cabo verde': 'Cape Verde',
 };
 
 const allTeams: Team[] = GROUPS.flatMap((group) => group.teams);
