@@ -122,6 +122,7 @@ const TEAM_ALIASES: Record<string, Team> = {
   'uefa playoff winner b': 'Ukraine/Sweden/Poland/Albania',
   'uefa playoff winner c': 'Turkey/Romania/Slovakia/Kosovo',
   'uefa playoff winner d': 'Denmark/North Macedonia/Czechia/Republic of Ireland',
+  'korea republic': 'South Korea',
   'intercontinental playoff winner 1': 'New Caledonia/Jamaica/DR Congo',
   'intercontinental playoff winner 2': 'Bolivia/Suriname/Iraq',
 };
