@@ -4,11 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        night: '#f8fafc',
-        pitch: '#ffffff',
-        accent: '#2563eb',
-        gold: '#0f172a',
+        surface: '#ffffff',
+        surfaceHover: '#f8fafc',
         border: '#e5e7eb',
+        textPrimary: '#0f172a',
+        textSecondary: '#475569',
+        accent: '#2563eb',
+        night: '#ffffff',
+        pitch: '#f8fafc',
+        gold: '#0f172a',
         muted: '#475569',
       },
     },
