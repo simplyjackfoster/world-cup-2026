@@ -19,12 +19,13 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
   };
 
   const baseStyles =
-    'w-full flex items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left transition border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+    'relative w-full flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-left transition bg-surface text-textPrimary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
   const selectedStyles =
-    'bg-accent/10 border-accent text-accent shadow-none hover:border-accent/80 focus-visible:outline-accent';
-  const idleStyles = 'bg-night border-border hover:border-accent/40 text-gold';
+    'border-accent bg-accent/10 text-textPrimary shadow-none translate-x-[2px] focus-visible:outline-accent';
+  const idleStyles = 'border-border hover:bg-surfaceHover';
   const disabledStyles = 'opacity-60 cursor-not-allowed';
-  const statusStyles = selected ? 'text-accent opacity-100' : 'text-transparent opacity-0';
+
+  const detail = source ?? meta?.confed ?? 'TBD';
 
   return (
     <button
@@ -34,20 +35,14 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
       onClick={handleClick}
       className={`${baseStyles} ${selected ? selectedStyles : idleStyles} ${disabled ? disabledStyles : ''}`}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-xl" aria-hidden>
-          {meta?.flag ?? '•'}
-        </span>
-        <div className="flex flex-col">
-          <span className="font-semibold text-sm leading-tight">{team ?? 'TBD'}</span>
-          <span className="text-[11px] uppercase tracking-wide text-muted leading-tight">
-            {team ? meta?.confed : source}
-          </span>
-        </div>
+      <div className="flex flex-col items-start gap-0.5">
+        <span className="text-sm font-semibold leading-5">{team ?? 'TBD'}</span>
+        <span className="text-[11px] leading-4 text-textSecondary">{detail}</span>
       </div>
-      <span className={`text-[11px] font-bold uppercase min-w-[80px] text-right ${statusStyles}`} aria-hidden={!selected}>
-        Advancing
-      </span>
+      <span
+        className={`ml-auto h-2.5 w-2.5 rounded-full border ${selected ? 'border-accent bg-accent/70' : 'border-border bg-surface'}`}
+        aria-hidden
+      />
     </button>
   );
 }
