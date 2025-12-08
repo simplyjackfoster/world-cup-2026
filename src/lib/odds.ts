@@ -93,12 +93,12 @@ const toDraftKingsOdds = (outcomes: { name: string; price: number }[], asOf: str
     const team = parseOutcomeName(outcome.name);
     if (!team) return acc;
     const bestPrice = acc[team];
-    acc[team] = bestPrice ? Math.min(bestPrice, outcome.price) : outcome.price;
+    acc[team] = typeof bestPrice === 'number' ? Math.min(bestPrice, outcome.price) : outcome.price;
     return acc;
-  }, {});
+  }, {} as Record<Team, number>);
 
   const sorted = Object.entries(mapped)
-    .map(([team, price]) => ({ team: team as Team, price }))
+    .map(([team, price]) => ({ team: team as Team, price: Number(price) }))
     .sort((a, b) => a.price - b.price);
 
   return { asOf, outcomes: sorted, source };

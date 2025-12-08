@@ -19,10 +19,10 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
   };
 
   const baseStyles =
-    'w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left transition border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+    'w-full flex items-center justify-between gap-2 rounded-md px-3 py-2.5 text-left transition border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
   const selectedStyles =
-    'bg-accent/15 border-accent text-accent shadow-[0_0_0_1px_rgba(56,189,248,0.4)] hover:border-accent/80 focus-visible:outline-accent';
-  const idleStyles = 'bg-slate-900/70 border-slate-800 hover:border-slate-700 text-slate-100';
+    'bg-accent/10 border-accent text-accent shadow-none hover:border-accent/80 focus-visible:outline-accent';
+  const idleStyles = 'bg-night border-border hover:border-accent/40 text-gold';
   const disabledStyles = 'opacity-60 cursor-not-allowed';
   const statusStyles = selected ? 'text-accent opacity-100' : 'text-transparent opacity-0';
 
@@ -40,7 +40,7 @@ export default function TeamChip({ team, source, selected = false, onSelect, dis
         </span>
         <div className="flex flex-col">
           <span className="font-semibold text-sm leading-tight">{team ?? 'TBD'}</span>
-          <span className="text-[11px] uppercase tracking-wide text-slate-400 leading-tight">
+          <span className="text-[11px] uppercase tracking-wide text-muted leading-tight">
             {team ? meta?.confed : source}
           </span>
         </div>

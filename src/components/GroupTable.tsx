@@ -69,22 +69,22 @@ export default function GroupTable({
             onDrop={handleDrop(idx)}
             className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition ${
               isDragging
-                ? 'border-accent bg-slate-900/80 text-accent'
+                ? 'border-accent bg-white text-accent shadow-none'
                 : isDropTarget
-                  ? 'border-accent/60 border-dashed bg-slate-900'
-                  : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                  ? 'border-dashed border-accent/70 bg-white'
+                  : 'border-border bg-white hover:border-accent/40'
             } ${canDrag ? 'cursor-grab active:cursor-grabbing select-none' : ''}`}
           >
             <div className="flex items-center gap-3">
               <span
-                className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold ${
-                  isDragging ? 'bg-accent/30 text-accent' : 'bg-slate-800 text-slate-200'
+                className={`inline-flex h-6 w-6 items-center justify-center rounded-sm text-[11px] font-semibold ${
+                  isDragging ? 'bg-accent/15 text-accent' : 'bg-night text-muted'
                 }`}
               >
                 {idx + 1}
               </span>
               <span className="text-lg">{meta?.flag}</span>
-              <span className="font-semibold text-slate-100">{row.team}</span>
+              <span className="font-semibold text-gold">{row.team}</span>
             </div>
             {allowFavorites && (
               <button
@@ -92,7 +92,7 @@ export default function GroupTable({
                   event.stopPropagation();
                   toggleFavorite(row.team);
                 }}
-                className={`text-sm ${isFavorite ? 'text-gold' : 'text-slate-500 hover:text-white'}`}
+                className={`text-sm ${isFavorite ? 'text-accent' : 'text-muted hover:text-accent'}`}
                 aria-label={isFavorite ? 'Unstar team' : 'Star team'}
               >
                 {isFavorite ? '★' : '☆'}
@@ -109,16 +109,12 @@ export default function GroupTable({
             setDragTargetIndex(standings.length);
           }}
           onDrop={handleDrop(standings.length)}
-          className={`h-2 rounded transition ${
-            dragTargetIndex === standings.length ? 'bg-accent/40' : 'bg-transparent'
-          }`}
+          className={`h-2 rounded transition ${dragTargetIndex === standings.length ? 'bg-accent/20' : 'bg-transparent'}`}
           aria-hidden
         />
       )}
-      {compact && <p className="text-xs text-slate-400">Tap for fixtures to see more details.</p>}
-      {canDrag && (
-        <p className="text-xs text-slate-400">Drag teams to set your preferred order for this group.</p>
-      )}
+      {compact && <p className="text-xs text-muted">Tap for fixtures to see more details.</p>}
+      {canDrag && <p className="text-xs text-muted">Drag teams to set your preferred order for this group.</p>}
     </div>
   );
 }

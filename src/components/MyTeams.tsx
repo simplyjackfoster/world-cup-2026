@@ -21,31 +21,31 @@ export default function MyTeams() {
   const renderEmpty = favorites.length === 0;
 
   return (
-    <div className="bg-pitch border border-slate-800 rounded-2xl p-5 shadow-card">
+    <div className="bg-pitch border border-border rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Personalize</p>
-          <h3 className="text-xl font-semibold">My Teams</h3>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted">Personalize</p>
+          <h3 className="text-xl font-semibold text-gold">My Teams</h3>
         </div>
-        <p className="text-xs text-slate-400">Star up to 3 squads</p>
+        <p className="text-xs text-muted">Star up to 3 squads</p>
       </div>
       {renderEmpty ? (
-        <p className="text-slate-400 text-sm">Tap stars on teams to see their fixtures here.</p>
+        <p className="text-muted text-sm">Tap stars on teams to see their fixtures here.</p>
       ) : (
         <div className="space-y-3">
           {cards.map(({ team, meta, matches, position, groupId }) => (
-            <div key={team} className="bg-night border border-slate-800 rounded-xl p-3">
+            <div key={team} className="bg-night border border-border rounded-lg p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{meta?.flag}</span>
                   <div>
-                    <p className="font-semibold">{team}</p>
-                    <p className="text-xs text-slate-400">Group {groupId ?? 'TBD'} · Position {position ?? '-'} </p>
+                    <p className="font-semibold text-gold">{team}</p>
+                    <p className="text-xs text-muted">Group {groupId ?? 'TBD'} · Position {position ?? '-'} </p>
                   </div>
                 </div>
                 <button
                   onClick={() => toggleFavorite(team as Team)}
-                  className="text-gold hover:text-white text-lg"
+                  className="text-accent hover:text-gold text-lg"
                   aria-label="Unstar"
                 >
                   ★
@@ -53,7 +53,7 @@ export default function MyTeams() {
               </div>
               <div className="mt-2 space-y-1 text-sm">
                 {matches.map((match) => (
-                  <p key={match.id} className="text-slate-300">
+                  <p key={match.id} className="text-muted">
                     {match.home} vs {match.away} · {new Date(match.date).toLocaleDateString()} ({match.city})
                   </p>
                 ))}

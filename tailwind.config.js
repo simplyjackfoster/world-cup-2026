@@ -4,13 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        night: '#0b1021',
-        pitch: '#0f172a',
-        accent: '#0ea5e9',
-        gold: '#fbbf24',
-      },
-      boxShadow: {
-        card: '0 12px 30px rgba(0,0,0,0.35)',
+        night: '#f8fafc',
+        pitch: '#ffffff',
+        accent: '#2563eb',
+        gold: '#0f172a',
+        border: '#e5e7eb',
+        muted: '#475569',
       },
     },
   },
