@@ -53,22 +53,22 @@ export default function GroupRankingsPanel() {
   );
 
   return (
-    <div className="bg-pitch border border-slate-800 rounded-2xl p-5 shadow-card">
+    <div className="bg-pitch border border-border rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Group rankings</p>
-          <h3 className="text-xl font-semibold">Drag to set the order</h3>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted">Group rankings</p>
+          <h3 className="text-xl font-semibold text-gold">Drag to set the order</h3>
         </div>
       </div>
-      <p className="text-sm text-slate-300 mb-3">
+      <p className="text-sm text-muted mb-3">
         Drag and drop teams inside each group to define your standings. The bracket updates automatically as you reorder.
       </p>
       <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
         {GROUPS.map((group) => (
-          <div key={group.id} className="bg-night border border-slate-800 rounded-xl p-3">
+          <div key={group.id} className="bg-night border border-border rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold">Group {group.id}</p>
-              <span className="text-xs text-slate-500">Top to bottom = your ranking</span>
+              <p className="font-semibold text-gold">Group {group.id}</p>
+              <span className="text-xs text-muted">Top to bottom = your ranking</span>
             </div>
             <div className="space-y-1">
               {standings[group.id].map((row, idx) => {
@@ -86,10 +86,10 @@ export default function GroupRankingsPanel() {
                       onDrop={handleDrop(group.id, idx)}
                       className={`flex items-center justify-between rounded-lg px-2 py-2 text-sm border transition ${
                         isDragging
-                          ? 'bg-slate-900/80 border-accent text-accent'
+                          ? 'bg-pitch border-accent text-accent'
                           : isDropTarget
-                            ? 'bg-slate-900 border-dashed border-accent/70'
-                            : 'bg-slate-900/60 border border-slate-800 hover:border-slate-700'
+                            ? 'bg-pitch border-dashed border-accent/70'
+                            : 'bg-night border border-border hover:border-accent/40'
                       }`}
                     >
                       <div className="flex items-center gap-2">
@@ -97,9 +97,9 @@ export default function GroupRankingsPanel() {
                           ≡
                         </span>
                         <span className="text-lg">{meta?.flag}</span>
-                        <span className="font-semibold">{row.team}</span>
+                        <span className="font-semibold text-gold">{row.team}</span>
                       </div>
-                      <span className="text-xs text-slate-400">{idx + 1}</span>
+                      <span className="text-xs text-muted">{idx + 1}</span>
                     </div>
                     {isDropTarget && (
                       <div className="h-1 rounded bg-accent/40 transition" aria-hidden />
@@ -121,8 +121,8 @@ export default function GroupRankingsPanel() {
           </div>
         ))}
       </div>
-      <div className="mt-4 bg-slate-900/50 rounded-xl p-3 text-sm text-slate-300">
-        <p className="font-semibold">Your current winners</p>
+      <div className="mt-4 bg-night rounded-xl p-3 text-sm text-muted">
+        <p className="font-semibold text-gold">Your current winners</p>
         <div className="flex flex-wrap gap-2 mt-2">
           {summary.map((row) => (
             <span key={row.id} className="px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-semibold">

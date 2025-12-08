@@ -10,22 +10,22 @@ const DraftKingsOddsPanel: React.FC<{ limit?: number | null }> = ({ limit = null
     typeof limit === 'number' && limit > 0 ? draftKingsOdds?.slice(0, limit) ?? [] : draftKingsOdds ?? [];
 
   return (
-    <div className="bg-pitch border border-slate-800 rounded-2xl p-4 shadow-card">
+    <div className="bg-pitch border border-border rounded-xl p-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-slate-400">DraftKings outrights</p>
-          <h3 className="text-lg font-semibold">Who the book has on top</h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted">DraftKings outrights</p>
+          <h3 className="text-lg font-semibold text-gold">Who the book has on top</h3>
+          <p className="text-xs text-muted">
             Loaded after the page settles and cached until you refresh.
             {draftKingsAsOf && ` Snapshot updated ${new Date(draftKingsAsOf).toLocaleString()}.`}
           </p>
         </div>
-        <div className="text-right text-xs text-slate-500">American odds</div>
+        <div className="text-right text-xs text-muted">American odds</div>
       </div>
 
-      {draftKingsLoading && <p className="mt-3 text-sm text-slate-300">Pulling DraftKings outrights…</p>}
+      {draftKingsLoading && <p className="mt-3 text-sm text-muted">Pulling DraftKings outrights…</p>}
       {!draftKingsLoading && draftKingsError && (
-        <div className="mt-3 text-sm text-amber-200">
+        <div className="mt-3 text-sm text-amber-700">
           Couldn’t load the market right now.
           <button className="ml-2 underline text-accent" onClick={refreshDraftKingsOdds}>
             Retry
@@ -40,19 +40,19 @@ const DraftKingsOddsPanel: React.FC<{ limit?: number | null }> = ({ limit = null
             return (
               <div
                 key={entry.team}
-                className="flex items-center justify-between gap-3 rounded-xl bg-slate-900 px-3 py-2 border border-slate-800"
+                className="flex items-center justify-between gap-3 rounded-lg bg-night px-3 py-2 border border-border"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-slate-500 w-6 text-right">{index + 1}</span>
+                  <span className="text-sm text-muted w-6 text-right">{index + 1}</span>
                   <span className="text-lg">{meta?.flag ?? '🏳️'}</span>
                   <div>
-                    <p className="font-semibold leading-tight">{entry.team}</p>
-                    <p className="text-xs text-slate-400">{meta?.confed ?? '—'}</p>
+                    <p className="font-semibold leading-tight text-gold">{entry.team}</p>
+                    <p className="text-xs text-muted">{meta?.confed ?? '—'}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-base font-semibold text-accent">{formatPrice(entry.price)}</p>
-                  <p className="text-[10px] uppercase tracking-[0.15em] text-slate-500">to win it all</p>
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-muted">to win it all</p>
                 </div>
               </div>
             );
